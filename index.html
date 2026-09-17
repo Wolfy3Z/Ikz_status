@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>G-Briere — Statut du serveur</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background:
+                radial-gradient(circle at top, #263238 0%, #111518 45%, #090b0c 100%);
+
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+
+            background: rgba(25, 29, 31, 0.95);
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+
+            padding: 35px 30px;
+
+            text-align: center;
+
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.55),
+                inset 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        /* Petite décoration en haut */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 4px;
+
+            background: linear-gradient(
+                90deg,
+                #4caf50,
+                #8bc34a,
+                #4caf50
+            );
+        }
+
+        .server-icon {
+            width: 90px;
+            height: 90px;
+
+            margin: 5px auto 20px;
+
+            border-radius: 18px;
+
+            background: #202528;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 48px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.35);
+
+            overflow: hidden;
+        }
+
+        .server-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .server-name {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .server-address {
+            color: #8f999e;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 10px 18px;
+
+            border-radius: 999px;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            margin-bottom: 30px;
+        }
+
+        .status.online {
+            background: rgba(76, 175, 80, 0.13);
+            color: #66e06b;
+            border: 1px solid rgba(76, 175, 80, 0.25);
+        }
+
+        .status.offline {
+            background: rgba(244, 67, 54, 0.13);
+            color: #ff6b61;
+            border: 1px solid rgba(244, 67, 54, 0.25);
+        }
+
+        .status.loading {
+            background: rgba(255, 255, 255, 0.06);
+            color: #bfc5c8;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .online .dot {
+            box-shadow: 0 0 12px #4caf50;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.045);
+
+            border: 1px solid rgba(255, 255, 255, 0.06);
+
+            border-radius: 15px;
+
+            padding: 18px;
+        }
+
+        .stat-title {
+            color: #8f999e;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .refresh-button {
+            width: 100%;
+
+            border: none;
+            border-radius: 14px;
+
+            padding: 14px;
+
+            background: #4caf50;
+            color: white;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease;
+        }
+
+        .refresh-button:hover {
+            background: #43a047;
+            transform: translateY(-1px);
+        }
+
+        .refresh-button:active {
+            transform: translateY(0);
+        }
+
+        .last-update {
+            margin-top: 15px;
+
+            color: #687277;
+
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+
+            color: #596166;
+
+            font-size: 11px;
+
+            margin-top: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            .server-name {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="server-icon" id="serverIcon">
+            ⛏️
+        </div>
+
+        <div class="server-name">
+            G-Briere
+        </div>
+
+        <div class="server-address">
+            G-Briere.aternos.me
+        </div>
+
+        <div class="status loading" id="status">
+            <span class="dot"></span>
+            Vérification...
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-title">
+                    👥 Joueurs connectés
+                </div>
+
+                <div class="stat-value" id="players">
+                    —
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">
+                    🎮 Jeu
+                </div>
+
+                <div class="stat-value" id="version">
+                    Minecraft
+                </div>
+            </div>
+
+        </div>
+
+        <button class="refresh-button" onclick="checkServer()">
+            🔄 Actualiser
+        </button>
+
+        <div class="last-update" id="lastUpdate">
+            Vérification en cours...
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Statut du serveur Minecraft
+    </div>
+
+</div>
+
+
+<script>
+
+    const SERVER = "G-Briere.aternos.me";
+
+    const API_URL =
+        "https://api.mcsrvstat.us/3/" + SERVER;
+
+
+    async function checkServer() {
+
+        const status = document.getElementById("status");
+        const players = document.getElementById("players");
+        const version = document.getElementById("version");
+        const lastUpdate = document.getElementById("lastUpdate");
+        const serverIcon = document.getElementById("serverIcon");
+
+
+        // État de chargement
+        status.className = "status loading";
+
+        status.innerHTML =
+            '<span class="dot"></span> Vérification...';
+
+        players.textContent = "—";
+
+        version.textContent = "Minecraft";
+
+
+        try {
+
+            const response = await fetch(API_URL, {
+                cache: "no-store"
+            });
+
+
+            if (!response.ok) {
+                throw new Error("API error");
+            }
+
+
+            const data = await response.json();
+
+
+            // Serveur EN LIGNE
+            if (data.online === true) {
+
+                status.className = "status online";
+
+                status.innerHTML =
+                    '<span class="dot"></span> SERVEUR EN LIGNE';
+
+
+                const playerCount =
+                    data.players?.online ?? 0;
+
+                const maxPlayers =
+                    data.players?.max ?? "?";
+
+
+                players.textContent =
+                    playerCount + " / " + maxPlayers;
+
+
+                if (data.version) {
+                    version.textContent = data.version;
+                }
+
+
+                // Icône du serveur
+                if (data.icon) {
+
+                    serverIcon.innerHTML =
+                        '<img src="' +
+                        data.icon +
+                        '" alt="Icône du serveur">';
+
+                }
+
+            }
+
+            // Serveur HORS LIGNE
+            else {
+
+                status.className = "status offline";
+
+                status.innerHTML =
+                    '<span class="dot"></span> SERVEUR HORS LIGNE';
+
+
+                players.textContent = "0";
+
+                version.textContent = "Minecraft";
+
+            }
+
+
+            const now = new Date();
+
+            lastUpdate.textContent =
+                "Dernière vérification : " +
+                now.toLocaleTimeString("fr-FR");
+
+        }
+
+        catch (error) {
+
+            status.className = "status offline";
+
+            status.innerHTML =
+                '<span class="dot"></span> IMPOSSIBLE DE VÉRIFIER';
+
+
+            players.textContent = "—";
+
+            version.textContent = "—";
+
+
+            lastUpdate.textContent =
+                "Erreur de connexion à l'API";
+
+        }
+
+    }
+
+
+    // Vérification immédiate
+    checkServer();
+
+
+    // Vérification automatique toutes les 60 secondes
+    setInterval(checkServer, 60000);
+
+</script>
+
+</body>
+</html>

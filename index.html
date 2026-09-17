@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>G-Briere — Statut du serveur</title>
+    <title>Internat — Statut du serveur</title>
 
     <style>
         * {
@@ -248,16 +248,20 @@
 
     <div class="card">
 
+        <!-- Logo personnalisé -->
         <div class="server-icon" id="serverIcon">
-            ⛏️
+            <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQviUtinCFZoql-58v6Eb-Wd7FJpb2piN7rpEkdjFitPSShPQckUp18qRb9&s=10"
+                alt="Logo du serveur"
+            >
         </div>
 
         <div class="server-name">
-            Ikz
+            Internat
         </div>
 
         <div class="server-address">
-            Ikz_5.aternos.me:42469
+            Ikz_5.aternos.me:42469 (26.2)
         </div>
 
         <div class="status loading" id="status">
@@ -308,7 +312,7 @@
 
 <script>
 
-    const SERVER = "G-Briere.aternos.me";
+    const SERVER = "Ikz_5.aternos.me:42469";
 
     const API_URL =
         "https://api.mcsrvstat.us/3/" + SERVER;
@@ -320,7 +324,6 @@
         const players = document.getElementById("players");
         const version = document.getElementById("version");
         const lastUpdate = document.getElementById("lastUpdate");
-        const serverIcon = document.getElementById("serverIcon");
 
 
         // État de chargement
@@ -371,17 +374,6 @@
 
                 if (data.version) {
                     version.textContent = data.version;
-                }
-
-
-                // Icône du serveur
-                if (data.icon) {
-
-                    serverIcon.innerHTML =
-                        '<img src="' +
-                        data.icon +
-                        '" alt="Icône du serveur">';
-
                 }
 
             }
